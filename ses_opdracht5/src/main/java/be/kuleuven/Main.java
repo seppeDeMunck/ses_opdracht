@@ -10,23 +10,23 @@ public class Main {
         ArrayList<Integer> uitput=new ArrayList<>();;
         arraylijstje.add(0);
         arraylijstje.add(0);
-        arraylijstje.add(1);
         arraylijstje.add(0);
-        arraylijstje.add(1);
-        arraylijstje.add(1);
         arraylijstje.add(0);
-        arraylijstje.add(2);
-        arraylijstje.add(2);
         arraylijstje.add(0);
-        arraylijstje.add(1);
-        arraylijstje.add(3);
         arraylijstje.add(0);
-        arraylijstje.add(1);
-        arraylijstje.add(1);
-        arraylijstje.add(1);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
+        arraylijstje.add(0);
         CheckNeighboursInGrid buren= new CheckNeighboursInGrid();
 
-        uitput   = (ArrayList<Integer>) buren.getSameNeighboursIds(arraylijstje,4,4,5);
+        uitput   = (ArrayList<Integer>) buren.getSameNeighboursIds(arraylijstje,4,4,12);
     System.out.print(uitput);
 
     }

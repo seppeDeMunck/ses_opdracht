@@ -1,3 +1,3 @@
-module be.kuleuven {
+module be.kuleuven.mijnjarfile {
     exports be.kuleuven;
 }

@@ -22,43 +22,43 @@ public class CheckNeighboursInGrid {
         for (int x:grid){
             lijstje.add(x);
         }
-        if((indexToCheck-breedte-1)>0&& (indexToCheck-breedte-1)<breedte*hoogte-1 && indexToCheck%breedte>0){
+        if((indexToCheck-breedte-1)>=0&& (indexToCheck-breedte-1)<=breedte*hoogte-1 && indexToCheck%breedte>0){
             if(lijstje.get(indexToCheck - breedte - 1).equals(lijstje.get(indexToCheck))){
                 output.add(indexToCheck-breedte-1);
             }
         }
-        if((indexToCheck-breedte)>0&& (indexToCheck-breedte)<breedte*hoogte-1){
+        if((indexToCheck-breedte)>=0&& (indexToCheck-breedte)<=breedte*hoogte-1){
             if(lijstje.get(indexToCheck - breedte).equals(lijstje.get(indexToCheck))){
                 output.add(indexToCheck-breedte);
             }
         }
-        if((indexToCheck-breedte+1)>0&& (indexToCheck-breedte+1)<breedte*hoogte-1&& indexToCheck%breedte<breedte-1){
+        if((indexToCheck-breedte+1)>=0&& (indexToCheck-breedte+1)<=breedte*hoogte-1&& indexToCheck%breedte<breedte-1){
             if(lijstje.get(indexToCheck - breedte + 1).equals(lijstje.get(indexToCheck))){
                 output.add(indexToCheck-breedte+1);
             }
         }
-        if((indexToCheck-1)>0&& (indexToCheck-1)<breedte*hoogte-1&& indexToCheck%breedte>0){
+        if((indexToCheck-1)>=0&& (indexToCheck-1)<=breedte*hoogte-1&& indexToCheck%breedte>0){
             if(lijstje.get(indexToCheck - 1).equals(lijstje.get(indexToCheck))){
                 output.add(indexToCheck-1);
             }
         }
 
-        if((indexToCheck+1)>0&& (indexToCheck+1)<breedte*hoogte-1&& indexToCheck%breedte<breedte-1){
+        if((indexToCheck+1)>=0&& (indexToCheck+1)<=breedte*hoogte-1&& indexToCheck%breedte<breedte-1){
             if(lijstje.get(indexToCheck + 1).equals(lijstje.get(indexToCheck))){
                 output.add(indexToCheck+1);
             }
         }
-        if((indexToCheck+breedte-1)>0 && (indexToCheck+breedte-1)<breedte*hoogte-1 && indexToCheck%breedte>0){
+        if((indexToCheck+breedte-1)>=0 && (indexToCheck+breedte-1)<=breedte*hoogte-1 && indexToCheck%breedte>0){
             if(lijstje.get(indexToCheck + breedte - 1).equals(lijstje.get(indexToCheck))){
                 output.add(indexToCheck+breedte-1);
             }
         }
-        if((indexToCheck+breedte)>0  && (indexToCheck+breedte)<breedte*hoogte-1 ){
+        if((indexToCheck+breedte)>=0  && (indexToCheck+breedte)<=breedte*hoogte-1 ){
             if(lijstje.get(indexToCheck + breedte).equals(lijstje.get(indexToCheck))){
                 output.add(indexToCheck+breedte);
             }
         }
-        if(0<(indexToCheck+breedte+1) && (indexToCheck+breedte+1)<breedte*hoogte-1 && indexToCheck%breedte<breedte-1){
+        if(0<=(indexToCheck+breedte+1) && (indexToCheck+breedte+1)<=breedte*hoogte-1 && indexToCheck%breedte<breedte-1){
             if(lijstje.get(indexToCheck + breedte + 1).equals(lijstje.get(indexToCheck))){
                 output.add(indexToCheck+breedte+1);
             }
