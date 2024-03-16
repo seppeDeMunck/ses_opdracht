@@ -24,6 +24,9 @@ public class CandycrushController {
     private Label Label;
 
     @FXML
+    private Label tip;
+
+    @FXML
     private Button btn;
 
     @FXML
@@ -37,6 +40,8 @@ public class CandycrushController {
 
     private CandycrushModel model;
     private CandycrushView view;
+    boolean ingame = false;
+
     @FXML
     void initialize() {
         assert Label != null : "fx:id=\"Label\" was not injected: check your FXML file 'candycrush-view.fxml'.";
@@ -44,27 +49,47 @@ public class CandycrushController {
         assert paneel != null : "fx:id=\"paneel\" was not injected: check your FXML file 'candycrush-view.fxml'.";
         assert speelbord != null : "fx:id=\"speelbord\" was not injected: check your FXML file 'candycrush-view.fxml'.";
         assert textInput != null : "fx:id=\"textInput\" was not injected: check your FXML file 'candycrush-view.fxml'.";
+        assert tip != null :  "fx:id=\"tip\" was not injected: check your FXML file 'candycrush-view.fxml'.";
         model = new CandycrushModel("Test");
         view = new CandycrushView(model);
         speelbord.getChildren().add(view);
         view.setOnMouseClicked(this::onCandyClicked);
         btn.setOnMouseClicked(this::update2);
+
     }
     public void update2(MouseEvent me){
-        if (textInput.getCharacters().toString().equals("seppe")){
-            update();
-            paneel.setStyle(color.BLUE);
-        }
-        else{
-            paneel.setStyle();
+        if(ingame) {
+            model.setPunten(0);
+            Label.setText("score = "+model.getPunten());
 
         }
+        else {
+            if (textInput.getCharacters().toString().equals("seppe")) {
+                update();
+                paneel.setStyle("-fx-background-color: #00c4ff; ");
+                tip.setText(" ");
+                btn.setText("reset");
+                textInput.setText("");
+                ingame = true;
+            } else {
+                paneel.setStyle("-fx-background-color: #ff0000; ");
+                tip.setStyle("-fx-font-size:30");
+                textInput.setText("");
+            }
+        }
 
-
-        update();
     }
     public void update(){
         view.update();
+        if (model.getPunten()>50){
+            paneel.setStyle("-fx-background-color: #00ffd0; ");
+        }
+        if (model.getPunten()>100){
+            paneel.setStyle("-fx-background-color: #00ff6f; ");
+        }
+        if (model.getPunten()>150){
+            paneel.setStyle("-fx-background-color: #2fff00; ");
+        }
     }
 
     public void onCandyClicked(MouseEvent me){
@@ -73,7 +98,5 @@ public class CandycrushController {
         update();
         Label.setText("score = "+model.getPunten());
     }
-
-
 
 }

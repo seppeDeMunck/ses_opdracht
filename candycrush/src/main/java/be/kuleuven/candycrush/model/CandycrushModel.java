@@ -29,7 +29,7 @@ public class CandycrushModel {
     }
 
     public static void main(String[] args) {
-        CandycrushModel model = new CandycrushModel("arne");
+        CandycrushModel model = new CandycrushModel("seppe");
         int i = 1;
         Iterator<Integer> iter = model.getSpeelbord().iterator();
         while (iter.hasNext()) {
@@ -66,27 +66,41 @@ public class CandycrushModel {
         return height;
     }
 
+    public void setSpeler(String speler) {
+        this.speler = speler;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setPunten(int punten) {
+        this.punten = punten;
+    }
+
     public void candyWithIndexSelected(int index) {
         if (index != -1) {
             ArrayList<Integer> arraylijstje;
             Random random = new Random();
             CheckNeighboursInGrid check = new CheckNeighboursInGrid();
             arraylijstje = (ArrayList<Integer>) check.getSameNeighboursIds(speelbord, width, height, index);
-            arraylijstje.add(index);
-            System.out.print(arraylijstje);
-            for (int i = 0; i < arraylijstje.size(); i++) {
-                int randomGetal = random.nextInt(5) + 1;
-                speelbord.set(arraylijstje.get(i), randomGetal);
-                punten++;
+            if(arraylijstje.size()>=3){
+                arraylijstje.add(index);
+                System.out.print(arraylijstje);
+                for (int i = 0; i < arraylijstje.size(); i++) {
+                    int randomGetal = random.nextInt(5) + 1;
+                    speelbord.set(arraylijstje.get(i), randomGetal);
+                    punten++;
+                }
             }
+
         } else {
             System.out.println("model:candyWithIndexSelected:indexWasMinusOne");
         }
-    }
-    public void ingelogd(){
-
-
-
     }
 
     public int getIndexFromRowColumn(int row, int column) {

@@ -12,8 +12,8 @@ public class CandycrushApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         fxmlLoader = new FXMLLoader(CandycrushApplication.class.getResource("candycrush-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
+        Scene scene = new Scene(fxmlLoader.load(), 1920/4, 1080/2.5);
+        stage.setTitle("login");
         stage.setScene(scene);
         stage.show();
     }
@@ -21,5 +21,6 @@ public class CandycrushApplication extends Application {
     public static void main(String[] args) {
         launch();
     }
+
 
 }

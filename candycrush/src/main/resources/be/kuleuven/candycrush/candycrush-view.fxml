@@ -7,7 +7,8 @@
    <children>
       <Button fx:id="btn" layoutX="321.0" layoutY="20.0" mnemonicParsing="false" text="Start" />
       <AnchorPane fx:id="speelbord" layoutX="95.0" layoutY="67.0" prefHeight="200.0" prefWidth="200.0" />
-      <Label fx:id="Label" layoutX="51.0" layoutY="24.0" text="Login" />
+      <Label fx:id="Label" layoutX="54.0" layoutY="24.0" text="Login" />
       <TextField fx:id="textInput" layoutX="120.0" layoutY="20.0" />
+      <Label fx:id="tip" layoutX="34.0" layoutY="259.0" text="correcte naam = seppe" />
    </children>
 </AnchorPane>
