@@ -1,1 +1,1 @@
-!https://github.com/seppeDeMunck/ses_opdracht/actions/workflows/gradle.yml/badge.svg
+![example workflow](https://github.com/seppeDeMunck/ses_opdracht/actions/workflows/gradle.yml/badge.svg)
