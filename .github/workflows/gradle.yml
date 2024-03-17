@@ -8,14 +8,13 @@ on:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
-defaults:
-    run:
+    defaults:
+      run:
         working-directory: ./candycrush
-        
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 21
@@ -23,8 +22,7 @@ defaults:
       with:
         java-version: '21'
         distribution: 'temurin'
-
-
+        
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
