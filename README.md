@@ -1,1 +1,1 @@
-![example workflow](https://github.com/USERNAME/REPONAME/actions/workflows/YMLFILENAME.yml/badge.svg)
+(https://github.com/USERNAME/REPONAME/actions/workflows/YMLFILENAME.yml/badge.svg)
