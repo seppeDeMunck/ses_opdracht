@@ -1,9 +1,14 @@
 package be.kuleuven.candycrush.view;
 
+import be.kuleuven.candycrush.model.Candy;
 import be.kuleuven.candycrush.model.CandycrushModel;
+import be.kuleuven.candycrush.model.Position;
+import be.kuleuven.candycrush.model.*;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
@@ -24,52 +29,61 @@ public class CandycrushView extends Region {
 
     public void update(){
         getChildren().clear();
-        int i = 0;
-        int height = 0;
-        Iterator<Integer> iter = model.getSpeelbord().iterator();
-        while(iter.hasNext()) {
-            int candy = iter.next();
-            Rectangle rectangle = new Rectangle(i * widthCandy, height * heigthCandy, widthCandy,heigthCandy);
-            if(candy==1) {
-                rectangle.setFill(Color.GREEN);
+        for(Position position : model.getBoard().positions()) {
+            Node node = makeShapeCandy(position, model.getCandyFromPosition(position));
+            getChildren().addAll(node);
             }
-            else if (candy==2){
-                rectangle.setFill(Color.BLUE);
-            }
-            else if (candy==3){
-                rectangle.setFill(Color.YELLOW);
-            }
-            else if (candy==4){
-                rectangle.setFill(Color.RED);
-            }
-            else {
-                rectangle.setFill(Color.BROWN);
-            }
-            rectangle.setStroke(Color.BLACK);
-            Text text = new Text("" + candy);
-            text.setX(rectangle.getX() + (rectangle.getWidth() - text.getBoundsInLocal().getWidth()) / 2);
-            text.setY(rectangle.getY() + (rectangle.getHeight() + text.getBoundsInLocal().getHeight()) / 2);
-            getChildren().addAll(rectangle,text);
+        }
 
-            if (i == model.getWidth() - 1) {
-                i = 0;
-                height++;
-            } else {
-                i++;
+
+    public Node makeShapeCandy(Position position, Candy candy) {
+        if (candy instanceof normalCandy) {
+            Circle circle = new Circle((position.kolom()+0.5) * widthCandy, (position.rij()+0.5) * heigthCandy, widthCandy/2);
+            switch (((normalCandy) candy).color()) {
+                case 0:
+                    circle.setFill(Color.GREEN);
+                    break;
+                case 1:
+                    circle.setFill(Color.BLUE);
+                    break;
+                case 2:
+                    circle.setFill(Color.YELLOW);
+                    break;
+                case 3:
+                    circle.setFill(Color.RED);
             }
+            return circle;
+        }
+        else{
+            Rectangle rectangle = new Rectangle(position.kolom() * widthCandy, position.rij() * heigthCandy, widthCandy, heigthCandy);
+            switch (candy.getClass().getSimpleName() ){
+                case "drop":
+                    rectangle.setFill(Color.GREEN);
+                    break;
+                case "kauwgom":
+                    rectangle.setFill(Color.BLUE);
+                    break;
+                case "lolly":
+                    rectangle.setFill(Color.YELLOW);
+                    break;
+                case "noga":
+                    rectangle.setFill(Color.RED);
+
+            }
+            return rectangle;
         }
     }
 
-    public int getIndexOfClicked(MouseEvent me){
+
+
+
+    public Position getIndexOfClicked(MouseEvent me){
         int index = -1;
         int row = (int) me.getY()/heigthCandy;
         int column = (int) me.getX()/widthCandy;
         System.out.println(me.getX()+" - "+me.getY()+" - "+row+" - "+column);
-        if (row < model.getWidth() && column < model.getHeight()){
-            index = model.getIndexFromRowColumn(row,column);
-            System.out.println(index);
-        }
-        return index;
+        Position position= new Position(column,row,model.getBoard());
+        return position;
     }
 }
 
