@@ -1,6 +1,5 @@
 package be.kuleuven.candycrush.model;
 
-import be.kuleuven.CheckNeighboursInGrid;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

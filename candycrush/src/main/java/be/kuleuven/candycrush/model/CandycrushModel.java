@@ -1,6 +1,5 @@
 package be.kuleuven.candycrush.model;
 
-import be.kuleuven.CheckNeighboursInGrid;
 
 import java.util.ArrayList;
 import java.util.Iterator;
