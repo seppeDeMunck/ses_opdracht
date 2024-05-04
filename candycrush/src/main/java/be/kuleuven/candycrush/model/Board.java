@@ -1,50 +1,64 @@
 package be.kuleuven.candycrush.model;
 
-import javafx.print.PrinterJob;
+import javafx.geometry.Pos;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.function.Function;
 
+
 public class Board <T> {
-    ArrayList<T> list;
+    private Map<Position , T> positionToCellMap = new HashMap<>();
+
+    private Map<T, Set<Position>> cellToPositionsMap = new HashMap<>();
     BoardSize boardSize;
-    Function<Position , T> CellCreator;
-    public Board(BoardSize boardSize, Function<Position , T> CellCreator){
-        this.CellCreator=CellCreator;
+    Function<Position , T> cellCreator;
+    public Board(BoardSize boardSize, Function<Position , T> cellCreator){
+        this.cellCreator =cellCreator;
         this.boardSize=boardSize;
-        int grotelijst=boardSize.kolommen()*boardSize.rijen();
-        list=new ArrayList<T>(grotelijst);
-        for (int i = 0; i < grotelijst; i++) {
-            list.add(null);
+        for (int row = 0; row < boardSize.rijen(); row++) {
+            for (int col = 0; col < boardSize.kolommen(); col++) {
+                Position position = new Position(row, col,boardSize);
+                T cell = cellCreator.apply(position);
+                positionToCellMap.put(position, cell);
+                cellToPositionsMap.computeIfAbsent(cell, k -> new HashSet<>()).add(position);
+            }
         }
     }
 
     public T getCellAt(Position position){
-        try{ return list.get(position.toIndex());}
-        catch (Exception e) {
-            System.out.print(e);
-            return null;
-        }
+        return positionToCellMap.get(position);
     }
 
     public void replaceCellAt(Position position, T newCell){
-        try{list.set(position.toIndex() , newCell);}
-        catch (Exception e){System.out.print(e);}
+        positionToCellMap.put(position, newCell);
     }
     public void fill(){
         for(int i = 0 ; i< boardSize.rijen();i++){
             for(int j = 0; j <boardSize.kolommen();j++){
-                T item=CellCreator.apply(new Position(i,j,boardSize));
-                list.set(j + (boardSize.kolommen()*i),item );
+                Position position=new Position(i,j,boardSize);
+                T item= cellCreator.apply(position);
+                positionToCellMap.put(position, item);
             }
         }
     }
-    public void copyTo(Board<T> otherBoard){
-        if (otherBoard.boardSize.rijen()!=this.boardSize.rijen()||
-                otherBoard.boardSize.kolommen()!=this.boardSize.kolommen()){
+    public void copyTo(Board<T> otherBoard) {
+        if (otherBoard.boardSize.rijen() != this.boardSize.rijen() ||
+                otherBoard.boardSize.kolommen() != this.boardSize.kolommen()) {
             throw new IllegalArgumentException("wrong size board");
         }
-        otherBoard.list=new ArrayList<>(this.list);
+        otherBoard.positionToCellMap.clear();
+        otherBoard.cellToPositionsMap.clear();
+
+        for (Map.Entry<Position, T> entry : positionToCellMap.entrySet()) {
+            Position position = entry.getKey();
+            T cell = entry.getValue();
+            otherBoard.positionToCellMap.put(position, cell);
+            otherBoard.cellToPositionsMap.computeIfAbsent(cell, k -> new HashSet<>()).add(position);
+        }
+    }
+    public Set<Position> getPositionsOfElement(T cell){
+        Set<Position> positions = cellToPositionsMap.getOrDefault(cell, Collections.emptySet());
+        return Collections.unmodifiableSet(new HashSet<>(positions));
     }
 
 
