@@ -10,10 +10,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 public class CandycrushView extends Region {
     private CandycrushModel model;
@@ -29,7 +25,7 @@ public class CandycrushView extends Region {
 
     public void update(){
         getChildren().clear();
-        for(Position position : model.getBoard().positions()) {
+        for(Position position : model.getBoardSize().positions()) {
             Node node = makeShapeCandy(position, model.getCandyFromPosition(position));
             getChildren().addAll(node);
             }
@@ -82,7 +78,7 @@ public class CandycrushView extends Region {
         int row = (int) me.getY()/heigthCandy;
         int column = (int) me.getX()/widthCandy;
         System.out.println(me.getX()+" - "+me.getY()+" - "+row+" - "+column);
-        Position position= new Position(column,row,model.getBoard());
+        Position position= new Position(column,row,model.getBoardSize());
         return position;
     }
 }

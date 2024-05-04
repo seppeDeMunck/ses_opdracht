@@ -7,26 +7,20 @@ import java.util.Random;
 
 public class CandycrushModel {
     private String speler;
-    private ArrayList<Candy> speelbord;
+    private Board board;
     private int punten;
-    private BoardSize board;
+    private BoardSize boardSize;
 
 
     public CandycrushModel(String speler) {                                 //maakt een lijst aan
         this.speler = speler;
-        speelbord = new ArrayList<>();
         punten = 0;
-        board = new BoardSize(10,10);
-
-        for (int i = 0; i < board.kolommen() * board.rijen(); i++) {                            //vult array met randum getallen
-            Random random = new Random();
-            int randomGetal = random.nextInt(5) + 1;
-            Position position=new Position(i% board.kolommen(),i/ board.kolommen(),board);
-            speelbord.add(randumCandy());
-        }
+        boardSize = new BoardSize(10,10);
+        board=new Board<>(boardSize,this::randumCandy);
+        board.fill();
     }
 
-    private Candy randumCandy(){
+    private Candy randumCandy(Position position){
         Random random = new Random();
         int randomGetal = random.nextInt(5) + 1;
 
@@ -42,19 +36,6 @@ public class CandycrushModel {
 
     public static void main(String[] args) {
         CandycrushModel model = new CandycrushModel("seppe");
-        int i = 1;
-        Iterator<Candy> iter = model.getSpeelbord().iterator();
-        while (iter.hasNext()) {
-            Candy candy = iter.next();
-            System.out.print(candy);
-            if (i % model.getWidth() == 0) {
-                System.out.print("\n");
-                i = 0;
-            }
-            i++;
-        }
-        System.out.print("\n");
-
 
     }
 
@@ -62,19 +43,19 @@ public class CandycrushModel {
         return speler;
     }
 
-    public ArrayList<Candy> getSpeelbord() {
-        return speelbord;
+    public Board getBoard() {
+        return board;
     }
 
     public int getWidth() {
-        return board.kolommen();
+        return boardSize.kolommen();
     }
 
     public int getPunten() {
         return punten;
     }
 
-    public int getHeight() {return board.rijen();}
+    public int getHeight() {return boardSize.rijen();}
 
     public void setSpeler(String speler) {
         this.speler = speler;
@@ -85,11 +66,11 @@ public class CandycrushModel {
     }
 
     public Candy getCandyFromPosition(Position position){
-        return speelbord.get(position.kolom() + board.kolommen() * position.rij());
+        return (Candy) board.getCellAt(position);
     }
 
-    public BoardSize getBoard() {
-        return board;
+    public BoardSize getBoardSize() {
+        return boardSize;
     }
     public Iterable<Position> getSameNeighbourPositions(Position position){
         ArrayList<Position> gelijkeburen= new ArrayList<Position>();
@@ -103,7 +84,7 @@ public class CandycrushModel {
 
     public void candyWithIndexSelected(Position position) {
         for(Position p:getSameNeighbourPositions(position)){
-            speelbord.set(p.toIndex(),randumCandy());
+            board.replaceCellAt(p,randumCandy(p));
             punten++;
         }
     }
