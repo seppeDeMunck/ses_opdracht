@@ -1,6 +1,7 @@
 package be.kuleuven.candycrush.model;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 public record Position(int kolom,int rij, BoardSize bord) {
     public Position {
@@ -31,8 +32,20 @@ public record Position(int kolom,int rij, BoardSize bord) {
         return buren;
     }
 
-    public boolean isLastColumn(){
-        return kolom==bord.kolommen()-1;
+    public Stream<Position> walkLeft(){
+        return Stream.iterate(this, pos -> new Position(pos.kolom() - 1, pos.rij(), bord))
+                .limit(kolom()+1);
     }
-
+    public Stream<Position> walkRight(){
+        return Stream.iterate(this, pos -> new Position(pos.kolom + 1, pos.rij, bord))
+                .limit(bord.kolommen() - kolom );
+    }
+    public Stream<Position> walkUp(){
+        return Stream.iterate(this, pos -> new Position(pos.kolom, pos.rij - 1, bord))
+            .limit(rij+1);
+    }
+    public Stream<Position> walkDown(){
+        return Stream.iterate(this, pos -> new Position(pos.kolom, pos.rij + 1, bord))
+            .limit(bord.rijen() - rij );
+    }
 }

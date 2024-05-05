@@ -1,9 +1,10 @@
 package be.kuleuven.candycrush.model;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 public class CandycrushModel {
     private String speler;
@@ -87,6 +88,63 @@ public class CandycrushModel {
             board.replaceCellAt(p,randumCandy(p));
             punten++;
         }
+    }
+
+    public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions){
+        Position position1 = positions.findFirst().orElse(null);
+        positions=positions.skip(1);
+        Position position2 = positions.findFirst().orElse(null);
+        if (position2==null||position1==null){return false;}
+        return board.getCellAt(position1).equals(candy) && board.getCellAt(position2).equals(candy);
+    }
+
+    public Stream<Position> horizontalStartingPositions(){
+        Position position= new Position(1,1,boardSize);
+        Stream<Position> linksePositions = position.walkDown();
+        Stream<Position> allePositions=linksePositions.flatMap(Position::walkRight);
+        Stream<Position> gefiltderdePositions=allePositions.filter(p -> !firstTwoHaveCandy((Candy)board.getCellAt(p),p.walkLeft()));
+        return gefiltderdePositions;
+    }
+
+    public Stream<Position> verticalStartingPositions(){
+        Position position= new Position(1,1,boardSize);
+        Stream<Position> linksePositions = position.walkDown();
+        Stream<Position> allePositions=linksePositions.flatMap(Position::walkRight);
+        Stream<Position> gefiltderdePositions=allePositions.filter(p -> !firstTwoHaveCandy((Candy)board.getCellAt(p),p.walkUp()));
+        return gefiltderdePositions;
+    }
+    public List<Position> longestMatchToRight(Position pos){
+        Stream<Position> posities=pos.walkRight().takeWhile(p -> board.getCellAt(p).equals(board.getCellAt(pos)));
+        return posities.toList();
+    }
+
+    public List<Position> longestMatchDown(Position pos){
+        Stream<Position> posities=pos.walkRight().takeWhile(p -> board.getCellAt(p).equals(board.getCellAt(pos)));
+        return posities.toList();
+    }
+
+    public Set<List<Position>> findAllMatches(){
+        Set<List<Position>> matches = new HashSet<>();
+
+        // Horizontale matches
+        Stream<Position> horizontalStartingPositions = horizontalStartingPositions();
+        horizontalStartingPositions.forEach(startPos -> {
+            List<Position> match = longestMatchToRight(startPos);
+            if (match.size() >= 3) {
+                matches.add(match);
+            }
+        });
+
+        // Verticale matches
+        Stream<Position> verticalStartingPositions = verticalStartingPositions();
+        verticalStartingPositions.forEach(startPos -> {
+            List<Position> match = longestMatchDown(startPos);
+            if (match.size() >= 3) {
+                matches.add(match);
+            }
+        });
+
+        return matches;
     }
 }
 
