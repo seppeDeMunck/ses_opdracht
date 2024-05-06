@@ -33,6 +33,11 @@ public class CandycrushView extends Region {
 
 
     public Node makeShapeCandy(Position position, Candy candy) {
+        if (candy instanceof LegeCandy){
+            Rectangle rectangle=new Rectangle(position.kolom() * widthCandy, position.rij() * heigthCandy, widthCandy, heigthCandy);
+            rectangle.setFill(Color.TRANSPARENT);
+            return rectangle;
+        }
         if (candy instanceof normalCandy) {
             Circle circle = new Circle((position.kolom()+0.5) * widthCandy, (position.rij()+0.5) * heigthCandy, widthCandy/2);
             switch (((normalCandy) candy).color()) {

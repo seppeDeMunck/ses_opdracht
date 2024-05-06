@@ -23,9 +23,8 @@ public record Position(int kolom,int rij, BoardSize bord) {
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
                 if (i == 0 && j == 0) continue;
-                try {
+                if(kolom+i<Position.this.bord.kolommen()&&kolom+i>=0&&rij+j<Position.this.bord.rijen()&&rij+j>=0){
                     buren.add(new Position(kolom+i,rij+j, bord));
-                }catch (IllegalArgumentException ignored){
                 }
             }
         }

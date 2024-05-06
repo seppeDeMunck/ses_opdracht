@@ -16,12 +16,12 @@ public class CandycrushModel {
     public CandycrushModel(String speler) {                                 //maakt een lijst aan
         this.speler = speler;
         punten = 0;
-        boardSize = new BoardSize(10,10);
-        board=new Board<>(boardSize,this::randumCandy);
+        boardSize = new BoardSize(10, 10);
+        board = new Board<>(boardSize, this::randumCandy);
         board.fill();
     }
 
-    private Candy randumCandy(Position position){
+    private Candy randumCandy(Position position) {
         Random random = new Random();
         int randomGetal = random.nextInt(5) + 1;
 
@@ -30,7 +30,7 @@ public class CandycrushModel {
             case 2 -> new kauwgom();
             case 3 -> new lolly();
             case 4 -> new noga();
-            default -> new normalCandy(random.nextInt(5)-1);
+            default -> new normalCandy(random.nextInt(5) - 1);
         };
         return candy;
     }
@@ -56,7 +56,9 @@ public class CandycrushModel {
         return punten;
     }
 
-    public int getHeight() {return boardSize.rijen();}
+    public int getHeight() {
+        return boardSize.rijen();
+    }
 
     public void setSpeler(String speler) {
         this.speler = speler;
@@ -66,64 +68,64 @@ public class CandycrushModel {
         this.punten = punten;
     }
 
-    public Candy getCandyFromPosition(Position position){
+    public Candy getCandyFromPosition(Position position) {
         return (Candy) board.getCellAt(position);
     }
 
     public BoardSize getBoardSize() {
         return boardSize;
     }
-    public Iterable<Position> getSameNeighbourPositions(Position position){
-        ArrayList<Position> gelijkeburen= new ArrayList<Position>();
-        for(Position p:position.neighborPositions()){
-            if(getCandyFromPosition(p).equals(getCandyFromPosition(position))){
-                gelijkeburen.add(p);}
+
+    public Iterable<Position> getSameNeighbourPositions(Position position) {
+        ArrayList<Position> gelijkeburen = new ArrayList<Position>();
+        for (Position p : position.neighborPositions()) {
+            if (getCandyFromPosition(p).equals(getCandyFromPosition(position))) {
+                gelijkeburen.add(p);
+            }
         }
         gelijkeburen.add(position);
         return gelijkeburen;
     }
 
     public void candyWithIndexSelected(Position position) {
-        for(Position p:getSameNeighbourPositions(position)){
-            board.replaceCellAt(p,randumCandy(p));
-            punten++;
+        if (!board.getCellAt(position).equals(new LegeCandy())){
+            board.replaceCellAt(position, randumCandy(position));
         }
+        updateBoard();
     }
 
-    public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions){
-        Position position1 = positions.findFirst().orElse(null);
-        positions=positions.skip(1);
-        Position position2 = positions.findFirst().orElse(null);
-        if (position2==null||position1==null){return false;}
-        return board.getCellAt(position1).equals(candy) && board.getCellAt(position2).equals(candy);
+    public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions) {
+        Candy legecandy= new LegeCandy();
+        if(candy.equals(legecandy)){return false;}
+        boolean antwoord = positions.limit(2).allMatch(p -> board.getCellAt(p).equals(candy));
+        return antwoord;
     }
 
-    public Stream<Position> horizontalStartingPositions(){
-        Position position= new Position(1,1,boardSize);
-        Stream<Position> linksePositions = position.walkDown();
-        Stream<Position> allePositions=linksePositions.flatMap(Position::walkRight);
-        Stream<Position> gefiltderdePositions=allePositions.filter(p -> !firstTwoHaveCandy((Candy)board.getCellAt(p),p.walkLeft()));
+    public Stream<Position> horizontalStartingPositions() {
+        Position position = new Position(0, 0, boardSize);
+        Stream<Position> gefiltderdePositions = position.walkDown().flatMap(Position::walkRight)//alleposities
+                .filter(p -> !firstTwoHaveCandy((Candy) board.getCellAt(p), p.walkLeft()) || p.kolom() == 0);//filter
         return gefiltderdePositions;
     }
 
-    public Stream<Position> verticalStartingPositions(){
-        Position position= new Position(1,1,boardSize);
-        Stream<Position> linksePositions = position.walkDown();
-        Stream<Position> allePositions=linksePositions.flatMap(Position::walkRight);
-        Stream<Position> gefiltderdePositions=allePositions.filter(p -> !firstTwoHaveCandy((Candy)board.getCellAt(p),p.walkUp()));
+    public Stream<Position> verticalStartingPositions() {
+        Position position = new Position(0, 0, boardSize);
+        Stream<Position> gefiltderdePositions = position.walkDown().flatMap(Position::walkRight)//dit geet alle posities
+                .filter(p -> !firstTwoHaveCandy((Candy) board.getCellAt(p), p.walkUp()) || p.rij() == 0);//dit firltert
         return gefiltderdePositions;
     }
-    public List<Position> longestMatchToRight(Position pos){
-        Stream<Position> posities=pos.walkRight().takeWhile(p -> board.getCellAt(p).equals(board.getCellAt(pos)));
+
+    public List<Position> longestMatchToRight(Position pos) {
+        Stream<Position> posities = pos.walkRight().takeWhile(p -> board.getCellAt(p).equals(board.getCellAt(pos)));
         return posities.toList();
     }
 
-    public List<Position> longestMatchDown(Position pos){
-        Stream<Position> posities=pos.walkRight().takeWhile(p -> board.getCellAt(p).equals(board.getCellAt(pos)));
+    public List<Position> longestMatchDown(Position pos) {
+        Stream<Position> posities = pos.walkDown().takeWhile(p -> board.getCellAt(p).equals(board.getCellAt(pos)));
         return posities.toList();
     }
 
-    public Set<List<Position>> findAllMatches(){
+    public Set<List<Position>> findAllMatches() {
         Set<List<Position>> matches = new HashSet<>();
 
         // Horizontale matches
@@ -145,6 +147,58 @@ public class CandycrushModel {
         });
 
         return matches;
+    }
+    public void clearMatch(List<Position> m){
+        List<Position> match= new ArrayList<>();
+        for (Position p:m){
+            match.add(p);
+        }
+        if(match.size()>0){
+            punten++;
+            board.replaceCellAt(match.get(0),new LegeCandy());
+            match.remove(0);
+            clearMatch(match);
+        }
+    }
+
+    public void fallDownTo(Position pos){
+        List<Position>lijst =pos.walkUp().collect(Collectors.toList());
+        Position prevposition=null;
+        for (Position p:lijst){
+            if (prevposition==null){
+                prevposition=p;
+                continue;
+            }
+            if (board.getCellAt(prevposition).equals(new LegeCandy())&&!board.getCellAt(p).equals(new LegeCandy())){
+                board.replaceCellAt(prevposition,board.getCellAt(p));
+                board.replaceCellAt(p,new LegeCandy());
+                fallDownTo(pos);
+                return;
+            }
+            prevposition=p;
+        }
+    }
+
+    public boolean updateBoard(){
+        Set<List<Position>> setOfLijstvanmatches=findAllMatches();
+        System.out.print(setOfLijstvanmatches+"\n");
+        if (setOfLijstvanmatches.size()<1){return false;}
+        int changed=0;
+        for(List<Position> p:setOfLijstvanmatches){
+            if (!board.getCellAt(p.get(0)).equals(new LegeCandy())){
+                clearMatch(p);
+                changed++;
+            }
+        }
+        Position positionlinksonder = new Position(0,boardSize.rijen()-1,boardSize);
+        List<Position> ondersterij= positionlinksonder.walkRight().toList();
+        if(changed>0){
+            for (Position p:ondersterij){
+                fallDownTo(p);
+            }
+            updateBoard();
+        }
+        return true;
     }
 }
 
