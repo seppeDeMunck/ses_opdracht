@@ -20,7 +20,7 @@ public class CandycrushModel {
     public CandycrushModel(String speler) {                                 //maakt een lijst aan
         this.speler = speler;
         punten = 0;
-        boardSize = new BoardSize(8, 8);
+        boardSize = new BoardSize(5, 5);
         board = new Board<>(boardSize, this::randumCandy);
         board.fill();
     }
