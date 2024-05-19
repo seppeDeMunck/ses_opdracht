@@ -72,12 +72,15 @@ public class CandycrushController {
                 btn.setText("reset");
                 textInput.setText("");
                 ingame = true;
+                model.updateBoard();
             } else {
                 paneel.setStyle("-fx-background-color: #ff0000; ");
                 tip.setStyle("-fx-font-size:30");
                 textInput.setText("");
             }
         }
+
+
 
     }
     public void update(){
@@ -98,6 +101,7 @@ public class CandycrushController {
         model.candyWithIndexSelected(position);
         update();
         Label.setText("score = "+model.getPunten());
+
     }
 
 }

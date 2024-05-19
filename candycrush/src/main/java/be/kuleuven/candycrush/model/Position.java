@@ -21,13 +21,18 @@ public record Position(int kolom,int rij, BoardSize bord) {
     public Iterable<Position> neighborPositions(){
         ArrayList<Position> buren = new ArrayList<>();
         for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                if (i == 0 && j == 0) continue;
-                if(kolom+i<Position.this.bord.kolommen()&&kolom+i>=0&&rij+j<Position.this.bord.rijen()&&rij+j>=0){
-                    buren.add(new Position(kolom+i,rij+j, bord));
-                }
+            if (i == 0) continue;
+            if(kolom+i<Position.this.bord.kolommen()&&kolom+i>=0&&rij<Position.this.bord.rijen()&&rij>=0){
+                buren.add(new Position(kolom+i,rij, bord));
             }
         }
+        for (int j = -1; j < 2; j++) {
+            if (j == 0) continue;
+                if(kolom<Position.this.bord.kolommen()&&kolom>=0&&rij+j<Position.this.bord.rijen()&&rij+j>=0){
+                    buren.add(new Position(kolom,rij+j, bord));
+                }
+            }
+
         return buren;
     }
 
