@@ -14,15 +14,21 @@ public class CandycrushModel {
     private int punten;
     private BoardSize boardSize;
 
-    private Position selectedPosition=null;
+    private Position selectedPosition = null;
 
 
     public CandycrushModel(String speler) {                                 //maakt een lijst aan
         this.speler = speler;
         punten = 0;
-        boardSize = new BoardSize(10, 10);
+        boardSize = new BoardSize(8, 8);
         board = new Board<>(boardSize, this::randumCandy);
         board.fill();
+    }
+
+    public CandycrushModel(BoardSize size) {
+        board = new Board<>(size);
+        speler = null;
+        boardSize=size;
     }
 
     private Candy randumCandy(Position position) {
@@ -82,44 +88,48 @@ public class CandycrushModel {
 
     public Iterable<Position> getNeighbourPositions(Position position) {
         ArrayList<Position> buren = new ArrayList<Position>();
-        buren= (ArrayList<Position>) position.neighborPositions();
+        buren = (ArrayList<Position>) position.neighborPositions();
         return buren;
     }
 
     public void candyWithIndexSelected(Position position) {
-        if(board.getCellAt(position)instanceof LegeCandy){return;}
-        if(selectedPosition==null){
-            selectedPosition=position;
+        maxscore();
+        if (board.getCellAt(position) instanceof LegeCandy) {
+            return;
+        }
+        if (selectedPosition == null) {
+            selectedPosition = position;
             System.out.println("eerste added");
             return;
         }
-        for (Position p :getNeighbourPositions(selectedPosition)){
-            System.out.println(p);
-            if(p.kolom()==position.kolom()&&p.rij()==position.rij()){
-                Candy candy= (Candy) board.getCellAt(selectedPosition);
-                board.replaceCellAt(selectedPosition,board.getCellAt(position));
-                board.replaceCellAt(position,candy);
+        for (Position p : getNeighbourPositions(selectedPosition)) {
+            //System.out.println(p);
+            if (p.kolom() == position.kolom() && p.rij() == position.rij()) {
+                Candy candy = (Candy) board.getCellAt(selectedPosition);
+                board.replaceCellAt(selectedPosition, board.getCellAt(position));
+                board.replaceCellAt(position, candy);
                 System.out.println("switch");
-                boolean succesvol=updateBoard();
+                boolean succesvol = updateBoard();
                 System.out.println("succes");
-                if(succesvol==true){
-                    selectedPosition=null;
+                if (succesvol == true) {
+                    selectedPosition = null;
                     return;
                 }
-                candy= (Candy) board.getCellAt(selectedPosition);
-                board.replaceCellAt(selectedPosition,board.getCellAt(position));
-                board.replaceCellAt(position,candy);
-                selectedPosition=position;
+                candy = (Candy) board.getCellAt(selectedPosition);
+                board.replaceCellAt(selectedPosition, board.getCellAt(position));
+                board.replaceCellAt(position, candy);
+                selectedPosition = position;
             }
         }
         System.out.println("fail");
-        selectedPosition=position;
+        selectedPosition = position;
         updateBoard();
     }
 
     public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions) {
-        Candy legecandy= new LegeCandy();
-        if(candy.equals(legecandy)){return false;}
+        if (candy instanceof LegeCandy) {
+            return false;
+        }
         boolean antwoord = positions.limit(2).allMatch(p -> board.getCellAt(p).equals(candy));
         return antwoord;
     }
@@ -171,176 +181,207 @@ public class CandycrushModel {
 
         return matches;
     }
-    public void clearMatch(List<Position> m){
-        List<Position> match= new ArrayList<>();
-        for (Position p:m){
+
+    public void clearMatch(List<Position> m) {
+        List<Position> match = new ArrayList<>();
+        for (Position p : m) {
             match.add(p);
         }
-        if(match.size()>0){
-            if (!(board.getCellAt(match.get(0)) instanceof LegeCandy)){
+        if (match.size() > 0) {
+            if (!(board.getCellAt(match.get(0)) instanceof LegeCandy)) {
                 punten++;
             }
-            board.replaceCellAt(match.get(0),new LegeCandy());
+            board.replaceCellAt(match.get(0), new LegeCandy());
             match.remove(0);
             clearMatch(match);
         }
     }
 
-    public void fallDownTo(Position pos){
-        List<Position>lijst =pos.walkUp().collect(Collectors.toList());
-        Position prevposition=null;
-        for (Position p:lijst){
-            if (prevposition==null){
-                prevposition=p;
+    public void fallDownTo(Position pos) {
+        List<Position> lijst = pos.walkUp().collect(Collectors.toList());
+        Position prevposition = null;
+        for (Position p : lijst) {
+            if (prevposition == null) {
+                prevposition = p;
                 continue;
             }
-            if (board.getCellAt(prevposition).equals(new LegeCandy())&&!board.getCellAt(p).equals(new LegeCandy())){
-                board.replaceCellAt(prevposition,board.getCellAt(p));
-                board.replaceCellAt(p,new LegeCandy());
+            if (board.getCellAt(prevposition).equals(new LegeCandy()) && !board.getCellAt(p).equals(new LegeCandy())) {
+                board.replaceCellAt(prevposition, board.getCellAt(p));
+                board.replaceCellAt(p, new LegeCandy());
                 fallDownTo(pos);
                 return;
             }
-            prevposition=p;
+            prevposition = p;
         }
     }
 
-    public boolean updateBoard(){
-        Set<List<Position>> setOfLijstvanmatches=findAllMatches();
-        int changed=0;
-        for(List<Position> p:setOfLijstvanmatches){
-            if (!board.getCellAt(p.get(0)).equals(new LegeCandy())){
+    public boolean updateBoard() {
+        Set<List<Position>> setOfLijstvanmatches = findAllMatches();
+        int changed = 0;
+        for (List<Position> p : setOfLijstvanmatches) {
+            if (!(board.getCellAt(p.get(0)) instanceof LegeCandy)) {
                 clearMatch(p);
                 changed++;
             }
         }
-        Position positionlinksonder = new Position(0,boardSize.rijen()-1,boardSize);
-        List<Position> ondersterij= positionlinksonder.walkRight().toList();
-        if(changed>0){
-            for (Position p:ondersterij){
+        Position positionlinksonder = new Position(0, boardSize.rijen() - 1, boardSize);
+        List<Position> ondersterij = positionlinksonder.walkRight().toList();
+        if (changed > 0) {
+            for (Position p : ondersterij) {
                 fallDownTo(p);
             }
             updateBoard();
         }
-        System.out.println(changed);
-        if (changed==0){return false;}
+        //System.out.println(changed);
+        if (changed == 0) {
+            return false;
+        }
         return true;
     }
 
     //##########################################BACKTRACKING###################################################
 
 
-    public boolean updatecurrentBoard(Board<Candy> currentboard){
-        Set<List<Position>> setOfLijstvanmatches=findAllMatches();
-        int changed=0;
-        for(List<Position> p:setOfLijstvanmatches){
-            if (!currentboard.getCellAt(p.get(0)).equals(new LegeCandy())){
-                clearMatch(p);
-                changed++;
-            }
+    public boolean matchAfterSwitch(Position p1, Position p2) {
+        Candy candy1 = (Candy) board.getCellAt(p1);
+        Candy candy2 = (Candy) board.getCellAt(p2);
+        board.replaceCellAt(p1, candy2);
+        board.replaceCellAt(p2, candy1);
+        Set<List<Position>> setOfLijstvanmatches = findAllMatches();
+        List<List<Position>> filteredLijst = new ArrayList<>();
+        for (List<Position> lijstje:setOfLijstvanmatches){
+            if (!(board.getCellAt(lijstje.get(0)) instanceof LegeCandy)){filteredLijst.add(lijstje);};
         }
-        Position positionlinksonder = new Position(0,boardSize.rijen()-1,boardSize);
-        List<Position> ondersterij= positionlinksonder.walkRight().toList();
-        if(changed>0){
-            for (Position p:ondersterij){
-                fallDownTo(p);
-            }
-            updateBoard();
-        }
-        System.out.println(changed);
-        if (changed==0){return false;}
-        return true;
-    }
-    boolean matchAfterSwitch(Position p1, Position p2,Board<Candy> currentboard){
-        Candy candy = (Candy) currentboard.getCellAt(p1);
-        currentboard.replaceCellAt(p1,currentboard.getCellAt(p2));
-        currentboard.replaceCellAt(p2,candy);
-        Set<List<Position>> setOfLijstvanmatches=findAllMatches();
-        currentboard.replaceCellAt(p2,currentboard.getCellAt(p1));
-        currentboard.replaceCellAt(p1,candy);
-        if (setOfLijstvanmatches.isEmpty()){
-            return false;
-        }
+        //System.out.println(setOfLijstvanmatches.size());
+        board.replaceCellAt(p2, candy2);
+        board.replaceCellAt(p1, candy1);
+        if (filteredLijst.isEmpty()) {return false;}
         return true;
     }
 
-    boolean wisselSnoepjes(Position p1, Position p2,Board<Candy> currentboard){
-        boolean buren=false;
-        for (Position p :getNeighbourPositions(p1)){
-            if (p.kolom()==p2.kolom()&&p.rij()==p2.rij()){
-                buren=true;
-                break;}
+    public boolean wisselSnoepjes(Position p1, Position p2) {
+        boolean buren = false;
+        for (Position p : getNeighbourPositions(p1)) {
+            if (p.kolom() == p2.kolom() && p.rij() == p2.rij()) {
+                buren = true;
+                break;
+            }
         }
-        if (buren==false){return false;}
-        if (currentboard.getCellAt(p1)instanceof LegeCandy){return false;}
-        if (currentboard.getCellAt(p2)instanceof LegeCandy){return false;}
-        if(!matchAfterSwitch(p1, p2,currentboard)){return false;}
-        Candy candy = (Candy) currentboard.getCellAt(p1);
-        currentboard.replaceCellAt(p1,currentboard.getCellAt(p2));
-        currentboard.replaceCellAt(p2,candy);
+        if (buren == false) {
+            return false;
+        }
+        if (board.getCellAt(p1) instanceof LegeCandy) {
+            return false;
+        }
+        if (board.getCellAt(p2) instanceof LegeCandy) {
+            return false;
+        }
+        if (!matchAfterSwitch(p1, p2)) {
+            return false;
+        }
+        Candy candy = (Candy) board.getCellAt(p1);
+        board.replaceCellAt(p1, board.getCellAt(p2));
+        board.replaceCellAt(p2, candy);
         updateBoard();
         return true;
     }
 
-    int aantalLegeCandys(Board<Candy> currentboard){
-        int puntjes=0;
+    public int aantalLegeCandys() {
+        int puntjes = 0;
         for (int i = 0; i < boardSize.rijen(); i++) {
-            for (int j = 0; j < boardSize.kolommen() ; j++) {
-                if(currentboard.getCellAt(new Position(j,i,boardSize)) instanceof LegeCandy){puntjes++;};
+            for (int j = 0; j < boardSize.kolommen(); j++) {
+                if (board.getCellAt(new Position(j, i, boardSize)) instanceof LegeCandy) {
+                    puntjes++;
+                }
+                ;
             }
         }
         return puntjes;
     }
-    List<List<Position>> mogelijkeSwaps(Board<Candy> currentboard){                                              //returnt mogelijke swaps
-        List<List<Position>> returnlijst= new ArrayList<>();
-        for (int i = 0; i < boardSize.kolommen(); i++) {
-            for (int j = 0; j < boardSize.rijen(); j++) {                           //checkt alle posities
-                Position position1 = new Position(i,j,boardSize);
-                if (i< boardSize.kolommen()-1){
-                    Position position2 = new Position(i+1,j,boardSize);
-                    if (matchAfterSwitch(position1,position2,currentboard)){
-                        List<Position> match= new ArrayList<>();
-                        match.add(position1);
-                        match.add(position2);
-                        returnlijst.add(match);
-                    }
+
+    public List<List<Position>> mogelijkeSwaps() {                                              //returnt mogelijke swaps
+        List<List<Position>> returnlijst = new ArrayList<>();
+        for (Position p1 : boardSize.positions()) {
+            if (p1.rij()< boardSize.rijen()-1){
+                Position p2= new Position(p1.kolom(),p1.rij()+1,boardSize);
+                if (matchAfterSwitch(p1, p2)) {
+                    List<Position> combinatie = new ArrayList<>();
+                    combinatie.add(p1);
+                    combinatie.add(p2);
+                    returnlijst.add(combinatie);
                 }
-                if (i< boardSize.rijen()-1){
-                    Position position2 = new Position(i,j+1,boardSize);
-                    if (matchAfterSwitch(position1,position2,currentboard)){
-                        List<Position> match= new ArrayList<>();
-                        match.add(position1);
-                        match.add(position2);
-                        returnlijst.add(match);
-                    }
+            }
+            if (p1.kolom()< boardSize.kolommen()-1){
+                Position p2= new Position(p1.kolom()+1,p1.rij(),boardSize);
+                if (matchAfterSwitch(p1, p2)) {
+                    List<Position> combinatie = new ArrayList<>();
+                    combinatie.add(p1);
+                    combinatie.add(p2);
+                    returnlijst.add(combinatie);
                 }
             }
         }
         return returnlijst;
     }
 
-    public record Solution(List<List<Position>> switches, int score){}
-    Solution maximizeScore(Board<Candy> currentboard,List<List<Position>> zetten,Solution solution){
 
-        List<List<Position>> mogelijkezetten =mogelijkeSwaps(currentboard);
-        if (mogelijkezetten.size()==0){
-            if (aantalLegeCandys(currentboard)>solution.score){
-                return new Solution(zetten,aantalLegeCandys(currentboard));
-            }
-            if (aantalLegeCandys(currentboard)==solution.score){
-                if (zetten.size()<solution.switches.size()){
-                    return new Solution(zetten,aantalLegeCandys(currentboard));
-                }
-            }
+    public record Solution(List<List<Position>> switches, int score) {
+    }
+
+    public int  maxscore() {
+        List<List<Position>> zetten = new ArrayList<>();
+        Solution solution = maximizeScore( zetten, new Solution(new ArrayList<>(), 0));
+        System.out.println("max waarde is :"+ solution.score);
+        return solution.score;
+
+    }
+    public Solution maximizeScore(List<List<Position>> zetten, Solution solution) {
+        List<List<Position>> swaps= mogelijkeSwaps();
+        //System.out.println(zetten.size());
+        //System.out.println(swaps.size());
+        if (swaps.isEmpty()){
+            if (aantalLegeCandys()>solution.score){return new Solution(zetten,aantalLegeCandys());}
+            if (aantalLegeCandys()<solution.score){return solution;}
+            if (solution.switches.size()>zetten.size()){return new Solution(zetten,aantalLegeCandys());}
+            return solution;
         }
-        for (List<Position> mogelijkezet:mogelijkezetten){
-            Board<Candy> newBoard =  new Board<>(boardSize, this::randumCandy);
-            currentboard.copyTo(newBoard);
-            wisselSnoepjes(mogelijkezet.get(0),mogelijkezet.get(1),newBoard);
-            zetten.add(mogelijkezet);
-            solution= maximizeScore(newBoard,zetten,solution);
+        for (List<Position> lijstje:swaps){
+            if (board.getCellAt(lijstje.get(0)) instanceof LegeCandy){continue;}
+            if (board.getCellAt(lijstje.get(1)) instanceof LegeCandy){continue;}
+            CandycrushModel newmodel = new CandycrushModel("naam");
+            board.copyTo(newmodel.getBoard());
+            newmodel.wisselSnoepjes(lijstje.get(0),lijstje.get(1));
+            List<List<Position>> niewezetten = new ArrayList<>(zetten);
+            niewezetten.add(lijstje);
+            newmodel.updateBoard();
+            solution=newmodel.maximizeScore(niewezetten,solution);
         }
     return solution;
     }
+    public static CandycrushModel createBoardFromString(String configuration) {
+        var lines = configuration.toLowerCase().lines().toList();
+        BoardSize size = new BoardSize(lines.size(), lines.getFirst().length());
+        CandycrushModel model = new CandycrushModel(size); // deze moet je zelf voorzien
+        for (int row = 0; row < lines.size(); row++) {
+            var line = lines.get(row);
+            for (int col = 0; col < line.length(); col++) {
+                Candy candy = characterToCandy(line.charAt(col));
+                model.getBoard().replaceCellAt(new Position(col, row, size), candy);
+            }
+        }
+        return model;
+    }
+    private static Candy characterToCandy(char c) {
+        return switch(c) {
+            case '.' -> new LegeCandy();
+            case 'o' -> new normalCandy(0);
+            case '*' -> new normalCandy(1);
+            case '#' -> new normalCandy(2);
+            case '@' -> new normalCandy(3);
+            default -> throw new IllegalArgumentException("Unexpected value: " + c);
+        };
+    }
+
 }
 
 

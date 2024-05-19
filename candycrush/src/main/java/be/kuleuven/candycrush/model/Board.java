@@ -25,7 +25,16 @@ public class Board <T> {
         }
     }
 
+    public Board(BoardSize boardSize) {
+        this.boardSize = boardSize;
+        positionToCellMap = new HashMap<>();
+        cellToPositionsMap = new HashMap<>();
+    }
+
     public T getCellAt(Position position){
+        if(positionToCellMap.get(position)==null){
+            return (T) new LegeCandy();
+        }
         return positionToCellMap.get(position);
     }
 

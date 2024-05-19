@@ -121,6 +121,19 @@ public class CandycrushModelTests {                                         // a
     }
 
 
+    @Test
+    public void TestBackTracking1(){
+        CandycrushModel candycrushModel= new  CandycrushModel("jeff");
+         CandycrushModel model = candycrushModel.createBoardFromString("""
+   @@o#
+   o*#o
+   @@**
+   *#@@""");
+
+         assertEquals(model.maxscore(),16);
+    }
+
+
 
 
 }
